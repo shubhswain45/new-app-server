@@ -9,7 +9,7 @@ class JWTService {
     public static generateTokenForUser(user: User) {
         const payload: JWTUser = {
             id: user?.id,
-            email: user?.email
+            username: user?.username
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET!)

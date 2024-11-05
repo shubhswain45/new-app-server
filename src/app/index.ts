@@ -5,6 +5,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { Auth } from './auth';
 import { GraphqlContext } from '../interfaces';
+import JWTService from '../services/JWTService';
+import cookieParser from 'cookie-parser'
 
 export async function initServer() {
     const app = express();
@@ -18,13 +20,14 @@ export async function initServer() {
     // Use CORS middleware
     app.use(cors(corsOptions));
     app.use(bodyParser.json());
+    app.use(cookieParser())
 
     const graphqlServer = new ApolloServer<GraphqlContext>({
         typeDefs: `
             ${Auth.types}
 
             type Query {
-                sayHello: String!
+                ${Auth.queries}
             }
 
             type Mutation {
@@ -34,7 +37,7 @@ export async function initServer() {
         `,
         resolvers: {
             Query: {
-                sayHello: () => "hello"
+                ...Auth.resolvers.queries
             },
 
             Mutation: {
@@ -46,9 +49,16 @@ export async function initServer() {
     await graphqlServer.start();
 
     // Middleware for handling GraphQL requests
-    app.use('/graphql', expressMiddleware(graphqlServer, {
+    app.use("/graphql", expressMiddleware(graphqlServer, {
         context: async ({ req, res }: { req: Request, res: Response }) => {
+            let user;
+
+            user = req.cookies["__mellowMoments_token"]
+                ? JWTService.decodeToken(req.cookies["__mellowMoments_token"])
+                : undefined;
+
             return {
+                user,
                 req,
                 res
             };

@@ -2,7 +2,7 @@ import { Request, Response } from "express"
 
 export interface JWTUser {
     id: string
-    email: string
+    username: string
 }
 
 export interface GraphqlContext {
