@@ -7,6 +7,7 @@ import { Auth } from './auth';
 import { GraphqlContext } from '../interfaces';
 import JWTService from '../services/JWTService';
 import cookieParser from 'cookie-parser'
+import { Post } from './post';
 
 export async function initServer() {
     const app = express();
@@ -25,6 +26,7 @@ export async function initServer() {
     const graphqlServer = new ApolloServer<GraphqlContext>({
         typeDefs: `
             ${Auth.types}
+            ${Post.types}
 
             type Query {
                 ${Auth.queries}
@@ -32,6 +34,7 @@ export async function initServer() {
 
             type Mutation {
                 ${Auth.mutations}
+                ${Post.mutations}
             }
 
         `,
@@ -41,7 +44,8 @@ export async function initServer() {
             },
 
             Mutation: {
-                ...Auth.resolvers.mutations
+                ...Auth.resolvers.mutations,
+                ...Post.resolvers.mutations
             }
         },
     });
