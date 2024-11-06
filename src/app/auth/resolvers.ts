@@ -47,6 +47,8 @@ const mutations = {
                 responseType: 'json'
             });
 
+            console.log("data", data);
+            
             // Check if the email is verified
             if (!data.email_verified) {
                 throw new Error("Email not verified by Google.");
@@ -58,7 +60,7 @@ const mutations = {
                 user = await prismaClient.user.create({
                     data: {
                         username: data.email.split("@")[0],
-                        fullName: data.family_name,
+                        fullName: data.family_name || data.given_name,
                         email: data.email,
                         profileImageURL: data.picture,
                         isVerified: true,
@@ -79,7 +81,21 @@ const mutations = {
         } catch (error: any) {
             throw new Error(error.message);
         }
-    }
+    },
+    
+    logout: async (parent: any, args: any, ctx: GraphqlContext) => {
+        try {
+            ctx.res.clearCookie("__mellowMoments_token", {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: 'strict'
+            });
+
+            return true;
+        } catch (error) {
+            throw new Error("Logout failed. Please try again.");
+        }
+    },
 };
 
 export const resolvers = {queries, mutations }
