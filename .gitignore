@@ -30,8 +30,7 @@ dist/
 
 # npm
 # Do NOT ignore package-lock.json - important for consistent dependencies
-# package-lock.json is included by default, no need to add it to .gitignore
-
+package-lock.json
 # TypeScript
 *.tsbuildinfo
 
